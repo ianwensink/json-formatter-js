@@ -1,7 +1,7 @@
 {
-  "name": "json-formatter-js",
+  "name": "json-formatter-js-hn",
   "version": "2.2.0",
-  "description": "JSON Formatter core library ",
+  "description": "JSON Formatter core library - HN support",
   "main": "dist/json-formatter.js",
   "types": "dist/src/index.d.js",
   "scripts": {
@@ -29,7 +29,7 @@
   "keywords": [
     "json"
   ],
-  "author": "Mohsen Azimi <me@azimi.me>",
+  "author": "Ian Wensink <ianwensink@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mohsen1/json-formatter-js/issues"

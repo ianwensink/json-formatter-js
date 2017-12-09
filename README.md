@@ -1,3 +1,4 @@
+Based on https://github.com/mohsen1/json-formatter-js
 # JSON Formatter
 
 [![Build Status](https://travis-ci.org/mohsen1/json-formatter-js.svg?branch=master)](https://travis-ci.org/mohsen1/json-formatter-js)
