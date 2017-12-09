@@ -1,6 +1,6 @@
 {
   "name": "json-formatter-js-hn",
-  "version": "2.2.0",
+  "version": "0.0.1",
   "description": "JSON Formatter core library - HN support",
   "main": "dist/json-formatter.js",
   "types": "dist/src/index.d.js",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mohsen1/json-formatter-js.git"
+    "url": "git+https://github.com/ianwensink/json-formatter-js.git"
   },
   "keywords": [
     "json"
@@ -34,7 +34,7 @@
   "bugs": {
     "url": "https://github.com/mohsen1/json-formatter-js/issues"
   },
-  "homepage": "https://github.com/mohsen1/json-formatter-js#readme",
+  "homepage": "https://github.com/ianwensink/json-formatter-js#readme",
   "devDependencies": {
     "@types/jest": "^19.2.2",
     "chai": "^3.2.0",
