@@ -17,6 +17,7 @@ export default class JSONFormatter {
     json: any;
     private open;
     private config;
+    private root;
     private key;
     private _isOpen;
     private element;
@@ -48,18 +49,20 @@ export default class JSONFormatter {
      * @param {string} [key=undefined] The key that this object in it's parent
      * context
     */
-    constructor(json: any, open?: number, config?: JSONFormatterConfiguration, key?: string);
+    constructor(json: any, open: number, config: JSONFormatterConfiguration, root: any, key?: string);
     private isOpen;
     private readonly isDate;
     private readonly isUrl;
     private readonly isArray;
     private readonly isObject;
+    private isUUID(key?);
     private readonly isEmptyObject;
     private readonly isEmpty;
     private readonly hasKey;
     private readonly constructorName;
     private readonly type;
     private readonly keys;
+    private getData(uuid);
     /**
      * Toggles `isOpen` state
      *

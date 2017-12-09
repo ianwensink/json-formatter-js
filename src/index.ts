@@ -80,7 +80,7 @@ export default class JSONFormatter {
    * @param {string} [key=undefined] The key that this object in it's parent
    * context
   */
-  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private key?: string) {
+  constructor(public json: any, private open = 1, private config: JSONFormatterConfiguration = _defaultConfig, private root: any, private key?: string) {
 
     // Setting default values for config object
     if (this.config.hoverPreviewEnabled === undefined) {
@@ -144,6 +144,10 @@ export default class JSONFormatter {
     return isObject(this.json);
   }
 
+  private isUUID(key: string = this.json): boolean {
+    return getType(key) === 'string' && getType(this.root) === 'object' && getType(this.root.data) === 'object' && getType(this.root.data[key]) !== 'undefined';
+  }
+
   /*
    * is this an empty object with no properties?
   */
@@ -170,7 +174,7 @@ export default class JSONFormatter {
    * if this is an object, get constructor function name
   */
   private get constructorName(): string {
-    return getObjectName(this.json);
+    return getObjectName(this.json, this.isUUID() || this.isUUID(this.key) || this.isUUID(this.json[this.key]) || this.isUUID(this.json.uuid) || this.key === 'target_uuid');
   }
 
   /*
@@ -191,6 +195,10 @@ export default class JSONFormatter {
     } else {
       return [];
     }
+  }
+
+  private getData(uuid: string): any {
+    return this.root.data[uuid];
   }
 
   /**
@@ -247,7 +255,10 @@ export default class JSONFormatter {
       if (this.json.length > this.config.hoverPreviewArrayCount) {
         return `Array[${this.json.length}]`;
       } else {
-        return `[${this.json.map(getPreview).join(', ')}]`;
+        return `[${this.json.map((key) => {
+          const json = this.isUUID(key) ? this.getData(key) : key;
+          return getPreview(json, this.isUUID(key));
+        }).join(', ')}]`;
       }
     } else {
 
@@ -257,7 +268,10 @@ export default class JSONFormatter {
       const narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount);
 
       // json value schematic information
-      const kvs = narrowKeys.map(key => `${key}:${getPreview(this.json[key])}`);
+      const kvs = narrowKeys.map(key => {
+          const json = this.isUUID(this.json[key]) ? this.getData(this.json[key]) : this.json[key];
+          return `${key}:${getPreview(json, this.isUUID(this.json[key]))}`;
+      });
 
       // if keys count greater then 5 then show ellipsis
       const ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? '…' : '';
@@ -273,6 +287,9 @@ export default class JSONFormatter {
    * @returns {HTMLDivElement}
   */
   render(): HTMLDivElement {
+    if(this.isUUID()) {
+      console.log('isUUID()', this.key, this.json, this.getData(this.json));
+    }
 
     // construct the root element and assign it to this.element
     this.element = createElement('div', 'row');
@@ -281,7 +298,7 @@ export default class JSONFormatter {
     const togglerLink = createElement('a', 'toggler-link');
 
     // if this is an object we need a wrapper span (toggler)
-    if (this.isObject) {
+    if (this.isObject || this.isUUID()) {
       togglerLink.appendChild(createElement('span', 'toggler'));
     }
 
@@ -291,7 +308,7 @@ export default class JSONFormatter {
     }
 
     // Value for objects and arrays
-    if (this.isObject) {
+    if (this.isObject || this.isUUID()) {
 
       // construct the value holder element
       const value = createElement('span', 'value');
@@ -351,7 +368,7 @@ export default class JSONFormatter {
     const children = createElement('div', 'children');
 
     // set CSS classes for children
-    if (this.isObject) {
+    if (this.isObject || this.isUUID()) {
       children.classList.add(cssClass('object'));
     }
     if (this.isArray) {
@@ -374,12 +391,12 @@ export default class JSONFormatter {
     this.element.appendChild(children);
 
     // if formatter is set to be open call appendChildren
-    if (this.isObject && this.isOpen) {
+    if ((this.isObject || this.isUUID()) && this.isOpen) {
       this.appendChildren();
     }
 
     // add event listener for toggling
-    if (this.isObject) {
+    if (this.isObject || this.isUUID()) {
       togglerLink.addEventListener('click', this.toggleOpen.bind(this));
     }
 
@@ -399,7 +416,8 @@ export default class JSONFormatter {
       let index = 0;
       const addAChild = ()=> {
         const key = this.keys[index];
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        const childrenJson = this.isUUID() ? this.getData(this.json) : this.json[key];
+        const formatter = new JSONFormatter(childrenJson, this.open - 1, this.config, this.root, key);
         children.appendChild(formatter.render());
 
         index += 1;
@@ -417,7 +435,8 @@ export default class JSONFormatter {
 
     } else {
       this.keys.forEach(key => {
-        const formatter = new JSONFormatter(this.json[key], this.open - 1, this.config, key);
+        const childrenJson = this.isUUID(this.json[key]) ? this.getData(this.json[key]) : this.json[key];
+        const formatter = new JSONFormatter(childrenJson, this.open - 1, this.config, this.root, key);
         children.appendChild(formatter.render());
       });
     }

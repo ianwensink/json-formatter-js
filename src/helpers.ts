@@ -18,7 +18,10 @@ export function isObject(value: any): boolean {
  * From http://stackoverflow.com/a/332429
  *
 */
-export function getObjectName(object: Object):string {
+export function getObjectName(object: any, isUUID: boolean = false):string {
+  if(isUUID) {
+    return `Reference${object.uuid ? ` (${object.uuid})` : ''}`;
+  }
   if (object === undefined) {
     return '';
   }
@@ -70,9 +73,11 @@ export function getValuePreview (object: Object, value: string): string {
 /*
  * Generates inline preview for a JavaScript object
 */
-export function getPreview(object: string): string {
+export function getPreview(object: any, isUUID: boolean = false): string {
   let value = '';
-  if (isObject(object)) {
+  if(isUUID) {
+    return `Reference${object.uuid ? ` (${object.uuid})` : ''}`;
+  } else if (isObject(object)) {
     value = getObjectName(object);
     if (Array.isArray(object))
       value += '[' + object.length + ']';

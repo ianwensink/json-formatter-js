@@ -7,7 +7,7 @@ function render() {
     live.style.backgroundColor = 'transparent';
     var result = document.getElementById('live-result');
     try {
-        var formatter = new JSONFormatter(JSON.parse(live.value), 1, { hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked });
+        var formatter = new JSONFormatter(JSON.parse(live.value), 1, { hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked }, JSON.parse(live.value));
         result.innerHTML = '';
         result.appendChild(formatter.render());
     } catch (e) {
@@ -55,7 +55,7 @@ var result = document.querySelector('.result');
 
 examples.forEach(function (example) {
     var title = document.createElement('h3');
-    var formatter = new JSONFormatter(example.json, 1, example.config);
+    var formatter = new JSONFormatter(example.json, 1, example.config, example.json);
 
     title.innerText = example.title;
 
@@ -71,7 +71,7 @@ examples.forEach(function (example) {
 
 fetch('demo/giant.json').then(function (resp) {
     resp.json().then(function (giant) {
-        var giantFormatter = new JSONFormatter(giant, 2, { hoverPreviewEnabled: true });
+        var giantFormatter = new JSONFormatter(giant, 2, { hoverPreviewEnabled: true }, giant);
         var title = document.createElement('h3');
 
         title.innerText = 'Giant JSON';

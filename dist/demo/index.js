@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -100,7 +100,7 @@ module.exports = function(modules) {
         return __webpack_require__.d(getter, "a", getter), getter;
     }, __webpack_require__.o = function(object, property) {
         return Object.prototype.hasOwnProperty.call(object, property);
-    }, __webpack_require__.p = "dist", __webpack_require__(__webpack_require__.s = 6);
+    }, __webpack_require__.p = "/dist/", __webpack_require__(__webpack_require__.s = 6);
 }([ function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     Object.defineProperty(__webpack_exports__, "__esModule", {
@@ -117,9 +117,10 @@ module.exports = function(modules) {
         animateClose: !0,
         theme: null
     }, JSONFormatter = function() {
-        function JSONFormatter(json, open, config, key) {
+        function JSONFormatter(json, open, config, root, key) {
             void 0 === open && (open = 1), void 0 === config && (config = _defaultConfig), this.json = json, 
-            this.open = open, this.config = config, this.key = key, this._isOpen = null, void 0 === this.config.hoverPreviewEnabled && (this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled), 
+            this.open = open, this.config = config, this.root = root, this.key = key, this._isOpen = null, 
+            void 0 === this.config.hoverPreviewEnabled && (this.config.hoverPreviewEnabled = _defaultConfig.hoverPreviewEnabled), 
             void 0 === this.config.hoverPreviewArrayCount && (this.config.hoverPreviewArrayCount = _defaultConfig.hoverPreviewArrayCount), 
             void 0 === this.config.hoverPreviewFieldCount && (this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount);
         }
@@ -156,7 +157,9 @@ module.exports = function(modules) {
             },
             enumerable: !0,
             configurable: !0
-        }), Object.defineProperty(JSONFormatter.prototype, "isEmptyObject", {
+        }), JSONFormatter.prototype.isUUID = function(key) {
+            return void 0 === key && (key = this.json), "string" === __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(key) && "object" === __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(this.root) && "object" === __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(this.root.data) && "undefined" !== __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(this.root.data[key]);
+        }, Object.defineProperty(JSONFormatter.prototype, "isEmptyObject", {
             get: function() {
                 return !this.keys.length && !this.isArray;
             },
@@ -176,13 +179,13 @@ module.exports = function(modules) {
             configurable: !0
         }), Object.defineProperty(JSONFormatter.prototype, "constructorName", {
             get: function() {
-                return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(this.json);
+                return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.c)(this.json, this.isUUID() || this.isUUID(this.key) || this.isUUID(this.json[this.key]) || this.isUUID(this.json.uuid) || "target_uuid" === this.key);
             },
             enumerable: !0,
             configurable: !0
         }), Object.defineProperty(JSONFormatter.prototype, "type", {
             get: function() {
-                return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.c)(this.json);
+                return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.b)(this.json);
             },
             enumerable: !0,
             configurable: !0
@@ -194,7 +197,9 @@ module.exports = function(modules) {
             },
             enumerable: !0,
             configurable: !0
-        }), JSONFormatter.prototype.toggleOpen = function() {
+        }), JSONFormatter.prototype.getData = function(uuid) {
+            return this.root.data[uuid];
+        }, JSONFormatter.prototype.toggleOpen = function() {
             this.isOpen = !this.isOpen, this.element && (this.isOpen ? this.appendChildren(this.config.animateOpen) : this.removeChildren(this.config.animateClose), 
             this.element.classList.toggle(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")));
         }, JSONFormatter.prototype.openAtDepth = function(depth) {
@@ -203,17 +208,22 @@ module.exports = function(modules) {
             this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")))));
         }, JSONFormatter.prototype.getInlinepreview = function() {
             var _this = this;
-            if (this.isArray) return this.json.length > this.config.hoverPreviewArrayCount ? "Array[" + this.json.length + "]" : "[" + this.json.map(__WEBPACK_IMPORTED_MODULE_0__helpers__.e).join(", ") + "]";
+            if (this.isArray) return this.json.length > this.config.hoverPreviewArrayCount ? "Array[" + this.json.length + "]" : "[" + this.json.map(function(key) {
+                var json = _this.isUUID(key) ? _this.getData(key) : key;
+                return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.e)(json, _this.isUUID(key));
+            }).join(", ") + "]";
             var keys = this.keys, narrowKeys = keys.slice(0, this.config.hoverPreviewFieldCount), kvs = narrowKeys.map(function(key) {
-                return key + ":" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.e)(_this.json[key]);
+                var json = _this.isUUID(_this.json[key]) ? _this.getData(_this.json[key]) : _this.json[key];
+                return key + ":" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.e)(json, _this.isUUID(_this.json[key]));
             }), ellipsis = keys.length >= this.config.hoverPreviewFieldCount ? "…" : "";
             return "{" + kvs.join(", ") + ellipsis + "}";
         }, JSONFormatter.prototype.render = function() {
+            this.isUUID() && console.log("isUUID()", this.key, this.json, this.getData(this.json)), 
             this.element = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("div", "row");
             var togglerLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("a", "toggler-link");
-            if (this.isObject && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "toggler")), 
+            if ((this.isObject || this.isUUID()) && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "toggler")), 
             this.hasKey && togglerLink.appendChild(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "key", this.key + ":")), 
-            this.isObject) {
+            this.isObject || this.isUUID()) {
                 var value = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "value"), objectWrapperSpan = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span"), constructorName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span", "constructor-name", this.constructorName);
                 if (objectWrapperSpan.appendChild(constructorName), this.isArray) {
                     var arrayWrapperSpan = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("span");
@@ -237,13 +247,13 @@ module.exports = function(modules) {
                 preview.appendChild(document.createTextNode(this.getInlinepreview())), togglerLink.appendChild(preview);
             }
             var children = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.f)("div", "children");
-            return this.isObject && children.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("object")), 
+            return (this.isObject || this.isUUID()) && children.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("object")), 
             this.isArray && children.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("array")), 
             this.isEmpty && children.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("empty")), 
             this.config && this.config.theme && this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)(this.config.theme)), 
             this.isOpen && this.element.classList.add(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("open")), 
-            this.element.appendChild(togglerLink), this.element.appendChild(children), this.isObject && this.isOpen && this.appendChildren(), 
-            this.isObject && togglerLink.addEventListener("click", this.toggleOpen.bind(this)), 
+            this.element.appendChild(togglerLink), this.element.appendChild(children), (this.isObject || this.isUUID()) && this.isOpen && this.appendChildren(), 
+            (this.isObject || this.isUUID()) && togglerLink.addEventListener("click", this.toggleOpen.bind(this)), 
             this.element;
         }, JSONFormatter.prototype.appendChildren = function(animated) {
             var _this = this;
@@ -251,12 +261,12 @@ module.exports = function(modules) {
             var children = this.element.querySelector("div." + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__helpers__.d)("children"));
             if (children && !this.isEmpty) if (animated) {
                 var index_1 = 0, addAChild_1 = function() {
-                    var key = _this.keys[index_1], formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+                    var key = _this.keys[index_1], childrenJson = _this.isUUID() ? _this.getData(_this.json) : _this.json[key], formatter = new JSONFormatter(childrenJson, _this.open - 1, _this.config, _this.root, key);
                     children.appendChild(formatter.render()), (index_1 += 1) < _this.keys.length && (index_1 > 10 ? addAChild_1() : requestAnimationFrame(addAChild_1));
                 };
                 requestAnimationFrame(addAChild_1);
             } else this.keys.forEach(function(key) {
-                var formatter = new JSONFormatter(_this.json[key], _this.open - 1, _this.config, key);
+                var childrenJson = _this.isUUID(_this.json[key]) ? _this.getData(_this.json[key]) : _this.json[key], formatter = new JSONFormatter(childrenJson, _this.open - 1, _this.config, _this.root, key);
                 children.appendChild(formatter.render());
             });
         }, JSONFormatter.prototype.removeChildren = function(animated) {
@@ -399,7 +409,7 @@ module.exports = function(modules) {
             return void 0 === memo && (memo = fn.apply(this, arguments)), memo;
         };
     }, isOldIE = memoize(function() {
-        return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+        return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
     }), getHeadElement = memoize(function() {
         return document.head || document.getElementsByTagName("head")[0];
     }), singletonElement = null, singletonCounter = 0, styleElementsInsertedAtTop = [];
@@ -445,7 +455,8 @@ module.exports = function(modules) {
         var type = typeof value;
         return !!value && "object" == type;
     }
-    function getObjectName(object) {
+    function getObjectName(object, isUUID) {
+        if (void 0 === isUUID && (isUUID = !1), isUUID) return "Reference" + (object.uuid ? " (" + object.uuid + ")" : "");
         if (void 0 === object) return "";
         if (null === object) return "Object";
         if ("object" == typeof object && !object.constructor) return "Object";
@@ -460,10 +471,12 @@ module.exports = function(modules) {
         return "null" === type || "undefined" === type ? type : ("string" === type && (value = '"' + escapeString(value) + '"'), 
         "function" === type ? object.toString().replace(/[\r\n]/g, "").replace(/\{.*\}/, "") + "{…}" : value);
     }
-    function getPreview(object) {
+    function getPreview(object, isUUID) {
+        void 0 === isUUID && (isUUID = !1);
         var value = "";
-        return isObject(object) ? (value = getObjectName(object), Array.isArray(object) && (value += "[" + object.length + "]")) : value = getValuePreview(object, object), 
-        value;
+        return isUUID ? "Reference" + (object.uuid ? " (" + object.uuid + ")" : "") : (isObject(object) ? (value = getObjectName(object), 
+        Array.isArray(object) && (value += "[" + object.length + "]")) : value = getValuePreview(object, object), 
+        value);
     }
     function cssClass(className) {
         return "json-formatter-" + className;
@@ -473,7 +486,7 @@ module.exports = function(modules) {
         return className && el.classList.add(cssClass(className)), void 0 !== content && (content instanceof Node ? el.appendChild(content) : el.appendChild(document.createTextNode(String(content)))), 
         el;
     }
-    __webpack_exports__.a = isObject, __webpack_exports__.b = getObjectName, __webpack_exports__.c = getType, 
+    __webpack_exports__.a = isObject, __webpack_exports__.c = getObjectName, __webpack_exports__.b = getType, 
     __webpack_exports__.g = getValuePreview, __webpack_exports__.e = getPreview, __webpack_exports__.d = cssClass, 
     __webpack_exports__.f = createElement;
 }, function(module, exports, __webpack_require__) {
@@ -494,7 +507,7 @@ function render() {
     live.style.backgroundColor = 'transparent';
     var result = document.getElementById('live-result');
     try {
-        var formatter = new JSONFormatter(JSON.parse(live.value), 1, { hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked });
+        var formatter = new JSONFormatter(JSON.parse(live.value), 1, { hoverPreviewEnabled: hoverPreviewEnabledCheckbox.checked }, JSON.parse(live.value));
         result.innerHTML = '';
         result.appendChild(formatter.render());
     } catch (e) {
@@ -542,7 +555,7 @@ var result = document.querySelector('.result');
 
 examples.forEach(function (example) {
     var title = document.createElement('h3');
-    var formatter = new JSONFormatter(example.json, 1, example.config);
+    var formatter = new JSONFormatter(example.json, 1, example.config, example.json);
 
     title.innerText = example.title;
 
@@ -558,7 +571,7 @@ examples.forEach(function (example) {
 
 fetch('demo/giant.json').then(function (resp) {
     resp.json().then(function (giant) {
-        var giantFormatter = new JSONFormatter(giant, 2, { hoverPreviewEnabled: true });
+        var giantFormatter = new JSONFormatter(giant, 2, { hoverPreviewEnabled: true }, giant);
         var title = document.createElement('h3');
 
         title.innerText = 'Giant JSON';

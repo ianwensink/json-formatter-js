@@ -132,10 +132,11 @@ describe('openAtDepth before any rendering', () => {
 describe('toggleOpen after rendering', () => {
 
     it('should toggle', () => {
-        const formatter = new JSONFormatter({depth1: {depth2: {depth3: {depth4: 21}}}}, Infinity, {
+        const json = {depth1: {depth2: {depth3: {depth4: 21}}}};
+        const formatter = new JSONFormatter(json, Infinity, {
             animateOpen: false,
             animateClose: false
-        });
+        }, json);
         const element = formatter.render();
 
         expect(element.outerHTML).toContain('Object');
@@ -153,10 +154,11 @@ describe('toggleOpen after rendering', () => {
 
 describe('toggleOpen before any rendering', () => {
     it('should toggle', () => {
-        const formatter = new JSONFormatter({depth1: {depth2: {depth3: {depth4: 21}}}}, Infinity, {
+        const json = {depth1: {depth2: {depth3: {depth4: 21}}}};
+        const formatter = new JSONFormatter(json, Infinity, {
             animateOpen: false,
             animateClose: false
-        });
+        }, json);
         formatter.toggleOpen();
         const element = formatter.render();
         expect(element.outerHTML).toContain('Object');
