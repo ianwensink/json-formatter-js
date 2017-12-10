@@ -37,6 +37,8 @@
   "homepage": "https://github.com/ianwensink/json-formatter-js#readme",
   "devDependencies": {
     "@types/jest": "^19.2.2",
+    "@types/node": "^8.0.57",
+    "babel-preset-env": "^1.6.1",
     "chai": "^3.2.0",
     "css-loader": "^0.26.1",
     "jest": "^19.0.2",
