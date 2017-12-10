@@ -8,8 +8,6 @@ import {
   createElement
 } from './helpers';
 
-import './style.less';
-
 const DATE_STRING_REGEX = /(^\d{1,4}[\.|\\/|-]\d{1,2}[\.|\\/|-]\d{1,4})(\s*(?:0?[1-9]:[0-5]|1(?=[012])\d:[0-5])\d\s*[ap]m)?$/;
 const PARTIAL_DATE_REGEX = /\d{2}:\d{2}:\d{2} GMT-\d{4}/;
 const JSON_DATE_REGEX = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
@@ -91,6 +89,15 @@ export default class JSONFormatter {
     }
     if (this.config.hoverPreviewFieldCount === undefined) {
       this.config.hoverPreviewFieldCount = _defaultConfig.hoverPreviewFieldCount;
+    }
+    const existingStyle = document.getElementById('jfhn-styleEl');
+    if(!existingStyle) {
+      // Insert CSS
+      const styleEl = document.createElement('style');
+      styleEl.id = 'jfhn-styleEl';
+      document.head.appendChild(styleEl);
+
+      styleEl.insertAdjacentHTML('beforeend', require('./style.less'));
     }
   }
 
